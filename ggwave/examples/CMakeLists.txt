@@ -43,9 +43,7 @@ endif()
 
 # third-party
 
-if (GGWAVE_SUPPORT_SDL2)
-    add_subdirectory(third-party)
-endif()
+add_subdirectory(third-party)
 
 # helper libraries
 
@@ -110,12 +108,12 @@ if (GGWAVE_SUPPORT_SDL2)
     else()
         # non-emscripten sdl2 examples
 
-        #add_subdirectory(ggwave-rx)
+        add_subdirectory(ggwave-rx)
         add_subdirectory(ggwave-cli)
     endif()
 
-    #add_subdirectory(waver)
-    #add_subdirectory(spectrogram)
+    add_subdirectory(waver)
+    add_subdirectory(spectrogram)
 endif()
 
 install(TARGETS ggwave-common

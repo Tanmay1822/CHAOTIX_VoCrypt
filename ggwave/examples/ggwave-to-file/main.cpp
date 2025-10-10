@@ -129,7 +129,10 @@ int main(int argc, char** argv) {
     fprintf(stderr, "Writing WAV data ...\n");
 
     drwav wav;
-    drwav_init_file_write(&wav, file.c_str(), &format, NULL);
+    if (!drwav_init_file_write(&wav, file.c_str(), &format, NULL)) {
+        fprintf(stderr, "Failed to open output file: %s\n", file.c_str());
+        return -5;
+    }
     drwav_uint64 framesWritten = drwav_write_pcm_frames(&wav, bufferPCM.size()/2, bufferPCM.data());
 
     fprintf(stderr, "WAV frames written = %d\n", (int) framesWritten);

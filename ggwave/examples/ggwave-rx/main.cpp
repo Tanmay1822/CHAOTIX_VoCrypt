@@ -1,9 +1,3 @@
-#include <thread>
-#include <chrono>
-
-
-
-
 #include "ggwave/ggwave.h"
 
 #include "ggwave-common.h"
