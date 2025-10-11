@@ -1230,7 +1230,7 @@ function App() {
                     transition: "all 0.3s ease",
                     boxShadow: "0 4px 15px rgba(139, 92, 246, 0.3)",
                   }}
-                  // onClick={playScriptSequentially}
+                  onClick={playScriptSequentially}
                   onMouseEnter={(e) => {
                     e.target.style.transform = "translateY(-2px)";
                     e.target.style.boxShadow =
@@ -1315,7 +1315,7 @@ function Composer({ onSend }) {
           cursor: "pointer",
         }}
         onClick={() => {
-          // onSend(text);
+          onSend(text);
           setText("");
         }}
         onMouseEnter={(e) => {
