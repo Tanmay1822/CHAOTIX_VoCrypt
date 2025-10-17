@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  chaotix:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - PORT=5055
+      - GGWAVE_BIN_DIR=/opt/ggwave/bin
+      - SERVE_CLIENT=true
+      # Optionally set build-time vars for client via build args or .env
+    ports:
+      - "5055:5055"
+    restart: unless-stopped
+
+

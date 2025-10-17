@@ -12,13 +12,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(cors());
+if (process.env.NODE_ENV !== 'production') {
+  app.use(cors());
+}
 app.use(express.json());
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Absolute paths to built binaries (macOS build done earlier)
-const BIN_DIR = path.resolve('/Users/tanmayjain/Desktop/final/ggwave/build-macos/bin');
+// Paths to ggwave binaries. Prefer env GGWAVE_BIN_DIR, else try a few common locations.
+const BIN_DIR = process.env.GGWAVE_BIN_DIR
+  ? path.resolve(process.env.GGWAVE_BIN_DIR)
+  : [
+      '/usr/local/bin',
+      '/opt/ggwave/bin',
+      path.resolve(__dirname, '../../..', 'ggwave', 'build-macos', 'bin'),
+    ].find(p => {
+      try { fs.accessSync(p); return true; } catch { return false; }
+    }) || '/usr/local/bin';
 const TO_FILE = path.join(BIN_DIR, 'ggwave-to-file');
 const FROM_FILE = path.join(BIN_DIR, 'ggwave-from-file');
 const CLI_BIN = path.join(BIN_DIR, 'ggwave-cli');
@@ -35,6 +45,17 @@ function ensureBinaryExists(filePath) {
 app.get('/health', (_req, res) => {
   res.json({ ok: true, toFile: ensureBinaryExists(TO_FILE), fromFile: ensureBinaryExists(FROM_FILE), cli: ensureBinaryExists(CLI_BIN) });
 });
+
+// Optionally serve the built client in production when SERVE_CLIENT=true
+if (process.env.SERVE_CLIENT === 'true') {
+  const clientBuild = path.resolve(__dirname, '../../client', 'dist');
+  if (fs.existsSync(clientBuild)) {
+    app.use(express.static(clientBuild));
+    app.get('*', (_req, res) => {
+      res.sendFile(path.join(clientBuild, 'index.html'));
+    });
+  }
+}
 
 // Encode a text into WAV. Body: { message, volume?, sampleRate?, protocol? }
 app.post('/encode', async (req, res) => {

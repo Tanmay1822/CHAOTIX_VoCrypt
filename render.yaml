@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: chaotix
+    env: docker
+    autoDeploy: true
+    plan: free
+    rootDir: .
+    dockerContext: .
+    dockerfilePath: Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5055
+      - key: GGWAVE_BIN_DIR
+        value: /opt/ggwave/bin
+      - key: SERVE_CLIENT
+        value: "true"
+

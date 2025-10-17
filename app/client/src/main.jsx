@@ -2,7 +2,18 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import axios from "axios";
 
-const API_BASE = "http://localhost:5055";
+// In production, prefer same-origin requests. Allow override via VITE_API_BASE / VITE_WS_BASE
+const API_BASE = (import.meta.env?.VITE_API_BASE ?? "");
+const WS_BASE = (import.meta.env?.VITE_WS_BASE ?? "");
+const buildApiUrl = (path) => {
+  if (API_BASE) return `${API_BASE}${path}`;
+  return path;
+};
+const buildWsUrl = (path) => {
+  if (WS_BASE) return `${WS_BASE}${path}`;
+  if (typeof window !== 'undefined') return `${window.location.origin.replace(/^http/, 'ws')}${path}`;
+  return `ws://localhost:5055${path}`;
+};
 
 function useAudioRecorder() {
   const mediaStream = useRef(null);
@@ -180,7 +191,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get(`${API_BASE}/health`)
+      .get(buildApiUrl(`/health`))
       .then((r) => setHealth(r.data))
       .catch(() => setHealth({ ok: false }));
   }, []);
@@ -207,7 +218,7 @@ function App() {
   // WS control using ggwave-cli (sender side real-time)
   const openWs = () => {
     if (wsRef.current) return;
-    const ws = new WebSocket(`ws://localhost:5055/ws/cli`);
+    const ws = new WebSocket(buildWsUrl(`/ws/cli`));
     ws.onopen = () => {
       setStatus("WS connected (CLI mode)");
       log({ type: "ws", msg: "connected" });
@@ -249,7 +260,7 @@ function App() {
       return;
     }
     const started = performance.now();
-    const resp = await fetch(`${API_BASE}/encode-long`, {
+    const resp = await fetch(buildApiUrl(`/encode-long`), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text }),
@@ -307,7 +318,7 @@ function App() {
     const form = new FormData();
     form.append("file", file);
     const started = performance.now();
-    const r = await fetch(`${API_BASE}/decode`, { method: "POST", body: form });
+    const r = await fetch(buildApiUrl(`/decode`), { method: "POST", body: form });
     const j = await r.json();
     log({
       type: "http_decode_ms",
