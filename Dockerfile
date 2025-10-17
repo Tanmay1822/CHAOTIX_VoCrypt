@@ -6,8 +6,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     build-essential cmake git pkg-config && rm -rf /var/lib/apt/lists/*
 WORKDIR /src/ggwave
 COPY ggwave/ ./
-RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DGGWAVE_BUILD_EXAMPLES=ON && \
-    cmake --build build -j
+RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DGGWAVE_BUILD_EXAMPLES=ON -DGGWAVE_SUPPORT_SDL2=OFF && \
+    cmake --build build --target ggwave-to-file ggwave-from-file -j
 
 # 2) Build client
 FROM node:20-bullseye AS client-builder
