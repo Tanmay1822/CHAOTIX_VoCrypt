@@ -3,11 +3,11 @@
 # 1) Build ggwave binaries
 FROM ubuntu:22.04 AS ggwave-builder
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    build-essential cmake git pkg-config && rm -rf /var/lib/apt/lists/*
+    build-essential cmake git pkg-config libsdl2-dev && rm -rf /var/lib/apt/lists/*
 WORKDIR /src/ggwave
 COPY ggwave/ ./
-RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DGGWAVE_BUILD_EXAMPLES=ON -DGGWAVE_SUPPORT_SDL2=OFF && \
-    cmake --build build --target ggwave-to-file ggwave-from-file -j
+RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DGGWAVE_BUILD_EXAMPLES=ON -DGGWAVE_SUPPORT_SDL2=ON && 
+    cmake --build build --target ggwave-to-file ggwave-from-file ggwave-cli -j
 
 # 2) Build client
 FROM node:20-bullseye AS client-builder
@@ -25,7 +25,7 @@ RUN cd server && npm ci --omit=dev
 
 # 4) Final runtime image
 FROM node:20-bullseye
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y ffmpeg libsdl2-2.0-0 && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production
 WORKDIR /srv
 

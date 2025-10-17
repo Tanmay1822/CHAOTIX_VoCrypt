@@ -257,7 +257,7 @@ function App() {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ type: "send", text }));
       log({ type: "ws_send", text });
-      return;
+      // Do not return; still do local encode so audio plays client-side
     }
     const started = performance.now();
     const resp = await fetch(buildApiUrl(`/encode-long`), {
